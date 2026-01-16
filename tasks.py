@@ -2,6 +2,13 @@ import json
 import os
 from storage import load_tasks, save_tasks
   
+STATUS_MAP = {
+    "done": (True, False),
+    "in_progress": (False, True),
+    "not_done": (False, False)
+}
+
+
 def add_tasks(title):
     tasks = load_tasks("data.json") 
     
@@ -23,41 +30,37 @@ def delete_tasks(task_id):
 
     save_tasks("data.json",tasks)
 
+def get_status(task):
+        if task["done"] == True:
+            return "Done"
+        elif task["in_progress"] == True:
+            return "In progress"
+        else: return "Pending"         
+
+
+def display_tasks(task):
+    print(f'ID: {task["id"]} | Title: {task["title"]} | Status: {get_status(task)}')
+    
 def list_tasks():
     tasks = load_tasks("data.json")
     for task in tasks:
-        if task["done"] == True:
-            status = "Done"
-        elif task["in_progress"] == True:
-            status = "In progress"
-        else: status = "Pending"         
-        print(f'ID: {task["id"]} | Title: {task["title"]} | Status: {status}')
+        display_tasks(task)
 
 def filter_tasks(status):
     tasks = load_tasks("data.json")
+    status = status.lower()
     for task in tasks:
-        if status.lower() == "done" and task["done"] == True:
-            print(f'ID: {task["id"]} | Title: {task["title"]} | Status: Done')
-        elif status.lower() == "in_progress" and task["in_progress"] == True:
-            print(f'ID: {task["id"]} | Title: {task["title"]} | Status: In progress')
-        elif status.lower() == "not_done" and task["in_progress"] == False and task["done"] == False:
-            print(f'ID: {task["id"]} | Title: {task["title"]} | Status: Not done')       
-
-            
-
-
+        if status == "done" and task["done"] == True:
+            display_tasks(task)
+        elif status == "in_progress" and task["in_progress"] == True:
+            display_tasks(task)
+        elif status == "not_done" and task["in_progress"] == False and task["done"] == False:
+            display_tasks(task)       
 
 def update_task(task_id, status):
     tasks = load_tasks("data.json")
+    status = status.lower()
     for task in tasks:
         if task["id"] == task_id:
-            if status.lower() == "done":
-                task["done"] = True
-                task["in_progress"] = False
-            elif status.lower() == "in_progress":
-                task["done"] = False
-                task["in_progress"] = True
-            elif status.lower() == "not_done":
-                task["done"] = False
-                task["in_progress"] = False                                     
+            task["done"], task["in_progress"] = STATUS_MAP[status]                                    
     save_tasks("data.json",tasks)            
