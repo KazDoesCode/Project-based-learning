@@ -69,4 +69,4 @@ def test_list_tasks():
 
     assert expected_output == captured_output.getvalue()
 
-    os.remove(test_file)    
+    os.remove(test_file)
